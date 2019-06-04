@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> </title>
+    </head>
+    <body>
+    <p>Inicializacija socketov:</p>
+    <div class="sckt">
+        IP: <input type="text" name="" class="ip"/> Ime: <input type="text" name="" class="name"/>
+    </div>
+    <div class="sckt">
+        IP: <input type="text" name="" class="ip"/> Ime: <input type="text" name="" class="name"/>
+    </div>
+    <div class="sckt">
+        IP: <input type="text" name="" class="ip"/> Ime: <input type="text" name="" class="name"/>
+    </div>
+    <div class="sckt">
+        IP: <input type="text" name="" class="ip"/> Ime: <input type="text" name="" class="name"/>
+    </div>
+    <button onClick="inicializiraj()">Inicializiraj sockete</button>
+
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        var socketsList = new Array();
+        
+        var inicializiraj = function() {
+            var sockets = document.getElementsByClassName('sckt')
+            for (var sckt of sockets) {
+                var ip = sckt.getElementsByClassName('ip')[0]
+                var name = sckt.getElementsByClassName('name')[0]
+                socketList.push({'socket': io.connect(ip), 'name': name})
+            }
+            console.log(socketsList)
+        }
+    </script>
+    </body>
+    
+
+</html>
