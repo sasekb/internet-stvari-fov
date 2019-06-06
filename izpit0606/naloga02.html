@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<html>
+    <head>
+        <title> </title>
+    </head>
+    <body>
+        
+        <canvas id="light-levels" width="600" height="400" style="border:1px dashed #009999"></canvas>
+        
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+    
+    var socket = io.connect("192.168.1.226:8080", {secure: true});
+    
+    function renderCharts(chart, y1, y2=false) {
+        chart.addDatapoint(y1, y2);
+        chart.render();
+    }
+    
+    class Chart {
+        constructor(id, maxHeight=1000) {
+            this.canvas = document.getElementById(id);
+            this.ctx = this.canvas.getContext("2d");
+            this.x = new Array();
+            this.y1 = new Array();
+            this.y2 = new Array();
+            this.maxGraphX = this.canvas.width;
+            this.maxGraphY = this.canvas.height;
+            this.maxHeight = maxHeight
+            
+            for (var i=0; i<this.maxGraphX*10 + 1; i++) {
+                this.x[i] = i;
+            }
+        }
+        
+        addDatapoint(y1, y2=false) {
+            if (this.y1.length == this.maxGraphX*10 + 1) {
+                this.y1.splice(0,1);
+                this.y1[this.maxGraphX*10] = y1;
+            }
+            else {
+                this.y1.push(y1);
+            }
+            if (y2) {
+                if (this.y2.length == this.maxGraphX*10 + 1) {
+                    this.y2.splice(0, 1);
+                    this.y2[this.maxGraphX*10] = y2;
+                }
+                else {
+                    this.y2.push(y2);
+                }
+            }
+        }
+        
+        render() {
+            this.ctx.clearRect(0, 0, this.maxGraphX, this.maxGraphY); 
+            this._drawLine(this.y1, 'orange');
+            this._drawLine(this.y2, 'grey')
+        }
+    
+        _drawLine(arr, color) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, 0);
+            for (var i=0; i < arr.length; i++) {
+                this.ctx.lineTo(this.x[i]/5000*500, (this.maxGraphY - (arr[i]/this.maxHeight) * this.maxGraphY));
+            }
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke();
+            this.ctx.closePath();
+          }
+    }
+    
+    var chart = new Chart("light-levels", 180);
+    
+    socket.on("lightLevels", function(value){
+        renderCharts(chart, value[0], value[1])
+    });   
+    
+    </script>
+
+    </body>
+</html>
+
